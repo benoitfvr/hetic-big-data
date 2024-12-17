@@ -1,0 +1,16 @@
+asgiref==3.8.1
+certifi==2024.12.14
+cffi==1.17.1
+channels==4.2.0
+charset-normalizer==3.4.0
+distlib==0.3.9
+Django==5.1.4
+djangorestframework==3.15.2
+filelock==3.16.1
+idna==3.10
+pycparser==2.22
+requests==2.32.3
+setuptools==75.6.0
+sqlparse==0.5.3
+urllib3==2.2.3
+wheel==0.45.1
