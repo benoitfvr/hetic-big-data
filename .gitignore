@@ -44,7 +44,6 @@ Desktop.ini
 /collectstatic
 /media
 /files
-/frontend
 
 # config
 settings.ini
