@@ -27,6 +27,8 @@ class StationListView(APIView):
                 "free_bikes": station.free_bikes,
                 "empty_slots": station.empty_slots,
                 "ebikes": station.ebikes,
+                "latitude": station.latitude,
+                "longitude": station.longitude,
                 "address": station.address
             } for station in stations]
 
