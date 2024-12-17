@@ -1,6 +1,7 @@
 asgiref==3.8.1
 certifi==2024.12.14
 cffi==1.17.1
+channels==4.2.0
 distlib==0.3.9
 Django==5.1.4
 djangorestframework==3.15.2
