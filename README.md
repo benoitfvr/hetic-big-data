@@ -18,8 +18,4 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 - Benoît Favrie ([@benoitfvr](https://github.com/benoitfvr))<br />
 - Paul Mazeau ([@PaulMazeau](https://github.com/PaulMazeau))<br />
-- Adrien Albuquerque ([@ADR1811](https://github.com/ADR1811))<br />
 - Nicolas Marsan ([@NicoooM](https://github.com/NicoooM))<br />
-- Nicolas Speich ([@nspeich](https://github.com/nspeich))<br />
-- Théo Sirieix ([@tsirius95](https://github.com/tsirius95))<br />
-- Brandon Vo ([@Hiteazel](https://github.com/Hiteazel))<br />
