@@ -1,0 +1,9 @@
+certifi==2024.8.30
+cffi==1.17.1
+distlib @ file:///private/tmp/python-distlib-20231212-4938-trhlvy/distlib-0.3.8
+filelock @ file:///private/tmp/python-filelock-20231112-5622-k62fq8/filelock-3.13.1/dist/filelock-3.13.1-py3-none-any.whl#sha256=57dbda9b35157b05fb3e58ee91448612eb674172fab98ee235ccb0b5bee19a1c
+packaging==24.2
+platformdirs @ file:///private/tmp/python-platformdirs-20231204-5317-3q4okz/platformdirs-4.1.0
+pycparser==2.22
+setuptools @ file:///private/tmp/python-setuptools-20231122-5040-cvipch/setuptools-69.0.2
+wheel @ file:///opt/homebrew/Cellar/python%403.12/3.12.7_1/libexec/wheel-0.44.0-py3-none-any.whl#sha256=c01326144883c50263d6967d1145640f3bbc8dfab32c2cbe817ef61d7a810219
