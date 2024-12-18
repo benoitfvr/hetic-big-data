@@ -46,7 +46,13 @@ const Map = ({ stations, mapRef }: MapProps) => {
               station.longitude.toString()
             }
             center={[station.latitude, station.longitude]}
-            pathOptions={{ color: "blue", fillColor: "blue" }}
+            pathOptions={
+              station.free_bikes <= 5 && station.free_bikes > 0
+                ? { color: "orange", fillColor: "orange" }
+                : station.free_bikes === 0
+                ? { color: "red", fillColor: "red" }
+                : { color: "green", fillColor: "green" }
+            }
             radius={200}
           >
             <Popup>
