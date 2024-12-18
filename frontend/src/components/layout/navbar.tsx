@@ -7,6 +7,7 @@ interface NavbarProps {
 
 export function Navbar({ className }: NavbarProps) {
   const [opacity, setOpacity] = useState(1);
+  const [display, setDisplay] = useState<'block' | 'none'>('block');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -16,6 +17,7 @@ export function Navbar({ className }: NavbarProps) {
             
       const newOpacity = Math.max(0, 1 - (scrollPosition / targetScroll));
       setOpacity(newOpacity);
+      setDisplay(newOpacity === 0 ? 'none' : 'block');
     };
 
     window.addEventListener("scroll", handleScroll);
@@ -24,7 +26,7 @@ export function Navbar({ className }: NavbarProps) {
 
   return (
     <nav 
-      style={{ opacity }}
+      style={{ opacity, display }}
       className={cn("fixed top-0 left-1/2 -translate-x-1/2 w-[calc(70%-2rem)] m-4 bg-white border z-50", className)}
     >
       <div className="container mx-auto px-4">
