@@ -16,4 +16,5 @@ export type Station = {
   ebikes: number;
   latitude: number;
   longitude: number;
+  network: string;
 };
