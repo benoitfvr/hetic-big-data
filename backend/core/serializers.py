@@ -19,7 +19,6 @@ class StationSerializer(serializers.ModelSerializer):
 
 
 class NetworkSerializer(serializers.ModelSerializer):
-    stations = StationSerializer(many=True, read_only=True)
 
     class Meta:
         model = Network
@@ -32,5 +31,4 @@ class NetworkSerializer(serializers.ModelSerializer):
             "country",
             "latitude",
             "longitude",
-            "stations",
         ]
