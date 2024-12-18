@@ -77,3 +77,16 @@ class FilteredStationListView(APIView):
         ]
 
         return Response({"stations": station_data}, status=status.HTTP_200_OK)
+    
+    
+class CityListView(APIView):
+    """
+    View pour lister toutes les villes où des stations sont présentes.
+    """
+
+    def get(self, request):
+        cities = Network.objects.values_list("city", flat=True).distinct()
+
+        cities = [city for city in cities if city]
+
+        return Response({"cities": cities}, status=status.HTTP_200_OK)
