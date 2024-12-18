@@ -9,7 +9,6 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         try:
-            # Étape 1 : Récupérer tous les réseaux
             networks_url = "https://api.citybik.es/v2/networks"
             response = requests.get(networks_url)
             networks_data = response.json()
@@ -18,7 +17,6 @@ class Command(BaseCommand):
                 self.stdout.write(self.style.ERROR("Pas de réseaux trouvés dans l'API."))
                 return
 
-            # Filtrer les réseaux en France (location.country == 'FR')
             french_networks = [
                 network for network in networks_data["networks"]
                 if network.get("location", {}).get("country") == "FR"
@@ -26,13 +24,11 @@ class Command(BaseCommand):
 
             self.stdout.write(self.style.SUCCESS(f"Nombre de réseaux en France trouvés : {len(french_networks)}"))
 
-            # Étape 2 : Synchroniser les réseaux français et leurs stations
             for i, network_info in enumerate(french_networks, start=1):
                 network_id = network_info["id"]
                 self.stdout.write(self.style.NOTICE(f"Synchronisation du réseau {i}/{len(french_networks)} : {network_info['name']}"))
 
                 try:
-                    # Appel API pour les détails du réseau (stations incluses)
                     url = f"https://api.citybik.es/v2/networks/{network_id}"
                     response = requests.get(url)
                     data = response.json()
@@ -40,7 +36,6 @@ class Command(BaseCommand):
                     if "network" not in data:
                         continue
 
-                    # Synchroniser les informations du réseau
                     network_data = data["network"]
                     network, _ = Network.objects.update_or_create(
                         external_id=network_data["id"],
@@ -53,8 +48,6 @@ class Command(BaseCommand):
                             "longitude": network_data["location"]["longitude"],
                         },
                     )
-
-                    # Synchroniser les stations associées
                     for station in network_data.get("stations", []):
                         Station.objects.update_or_create(
                             external_id=station["id"],
@@ -75,7 +68,6 @@ class Command(BaseCommand):
                 except Exception as network_error:
                     self.stdout.write(self.style.ERROR(f"Erreur pour le réseau {network_id} : {network_error}"))
 
-            # Étape 3 : Diffuser les mises à jour via WebSocket
             stations = Station.objects.all()
             station_data = [
                 {

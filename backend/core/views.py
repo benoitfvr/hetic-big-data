@@ -63,7 +63,6 @@ class CityListView(APIView):
     def get(self, request):
         cities = Network.objects.values_list("city", flat=True).distinct()
 
-        # Retirer les vills vides ou nulles
         cities = [city for city in cities if city]
 
         return Response({"cities": cities}, status=status.HTTP_200_OK)
