@@ -1,0 +1,71 @@
+<!-- templates/test_websocket.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bike Networks WebSocket Test</title>
+</head>
+<body>
+    <h1>Bike Networks WebSocket Test</h1>
+    <div>
+        <h2>Networks</h2>
+        <div id="networks"></div>
+    </div>
+    <div>
+        <h2>Stations</h2>
+        <input type="text" id="networkId" placeholder="Enter network ID">
+        <button onclick="subscribeToNetwork()">Subscribe to Network</button>
+        <div id="stations"></div>
+    </div>
+    <div id="messages"></div>
+
+    <script>
+        const socket = new WebSocket(
+            'ws://' + window.location.host + '/ws/networks/'
+        );
+
+        socket.onopen = function(e) {
+            addMessage('Connected to WebSocket');
+        };
+
+        socket.onmessage = function(e) {
+            const data = JSON.parse(e.data);
+            addMessage('Received: ' + JSON.stringify(data));
+            
+            if (data.type === 'network_list') {
+                updateNetworks(data.networks);
+            } else if (data.type === 'station_update') {
+                updateStations(data.stations);
+            }
+        };
+
+        socket.onclose = function(e) {
+            addMessage('Disconnected from WebSocket');
+        };
+
+        function subscribeToNetwork() {
+            const networkId = document.getElementById('networkId').value;
+            const message = {
+                command: 'subscribe_network',
+                network_id: networkId
+            };
+            socket.send(JSON.stringify(message));
+            addMessage('Subscribed to network: ' + networkId);
+        }
+
+        function updateNetworks(networks) {
+            const networksDiv = document.getElementById('networks');
+            networksDiv.innerHTML = JSON.stringify(networks, null, 2);
+        }
+
+        function updateStations(stations) {
+            const stationsDiv = document.getElementById('stations');
+            stationsDiv.innerHTML = JSON.stringify(stations, null, 2);
+        }
+
+        function addMessage(message) {
+            const messages = document.getElementById('messages');
+            messages.innerHTML += '<p>' + message + '</p>';
+        }
+    </script>
+</body>
+</html>

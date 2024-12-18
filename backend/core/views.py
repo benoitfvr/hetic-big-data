@@ -4,6 +4,7 @@ from rest_framework import status
 from .models import Network, Station
 from .serializers import NetworkSerializer
 from django.db.models import Q
+from django.shortcuts import render
 
 class NetworkListView(APIView):
     """
@@ -66,3 +67,7 @@ class CityListView(APIView):
         cities = [city for city in cities if city]
 
         return Response({"cities": cities}, status=status.HTTP_200_OK)
+    
+
+def watch_view(request):
+    return render(request, 'watch.html')
