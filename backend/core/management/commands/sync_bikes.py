@@ -24,31 +24,21 @@ class Command(BaseCommand):
 
             self.stdout.write(self.style.SUCCESS(f"Nombre de réseaux en France trouvés : {len(french_networks)}"))
 
-            for i, network_info in enumerate(french_networks, start=1):
-                network_id = network_info["id"]
-                self.stdout.write(self.style.NOTICE(f"Synchronisation du réseau {i}/{len(french_networks)} : {network_info['name']}"))
-
+            for network_info in french_networks:
                 try:
-                    url = f"https://api.citybik.es/v2/networks/{network_id}"
-                    response = requests.get(url)
-                    data = response.json()
-
-                    if "network" not in data:
-                        continue
-
-                    network_data = data["network"]
                     network, _ = Network.objects.update_or_create(
-                        external_id=network_data["id"],
+                        external_id=network_info["id"],
                         defaults={
-                            "name": network_data["name"],
-                            "company": ", ".join(network_data.get("company", [])),
-                            "city": network_data["location"]["city"],
-                            "country": network_data["location"]["country"],
-                            "latitude": network_data["location"]["latitude"],
-                            "longitude": network_data["location"]["longitude"],
+                            "name": network_info["name"],
+                            "company": ", ".join(network_info.get("company", [])),
+                            "city": network_info["location"]["city"],
+                            "country": network_info["location"]["country"],
+                            "latitude": network_info["location"]["latitude"],
+                            "longitude": network_info["location"]["longitude"],
                         },
                     )
-                    for station in network_data.get("stations", []):
+
+                    for station in network_info.get("stations", []):
                         Station.objects.update_or_create(
                             external_id=station["id"],
                             network=network,
@@ -63,10 +53,10 @@ class Command(BaseCommand):
                             },
                         )
 
-                    self.stdout.write(self.style.SUCCESS(f"Réseau synchronisé : {network_data['name']}"))
+                    self.stdout.write(self.style.SUCCESS(f"Réseau synchronisé : {network_info['name']}"))
 
                 except Exception as network_error:
-                    self.stdout.write(self.style.ERROR(f"Erreur pour le réseau {network_id} : {network_error}"))
+                    self.stdout.write(self.style.ERROR(f"Erreur pour le réseau {network_info['id']} : {network_error}"))
 
             stations = Station.objects.all()
             station_data = [
