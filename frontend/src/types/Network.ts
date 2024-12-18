@@ -1,10 +1,7 @@
 export type Network = {
   id: number;
-  company: string;
-  city: string;
-  latitude: number;
-  longitude: number;
-  stations: Station[];
+  external_id: string;
+  name: string;
 };
 
 export type Station = {

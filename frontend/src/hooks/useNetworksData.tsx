@@ -1,17 +1,25 @@
-import { Station } from "src/types/Network";
 import { useEffect, useState } from "react";
+import { Network } from "src/types/Network";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
-export const useNetworksData = (filters: string): Station[] => {
-  const [networks, setNetworks] = useState<Station[]>([]);
+export const useNetworksData = (): Network[] => {
+  const [networks, setNetworks] = useState<Network[]>([]);
 
   useEffect(() => {
-    fetch(API_URL + "/stations?" + filters)
+    fetch(API_URL + "/networks")
       .then((response) => response.json())
-      .then((data) => setNetworks(data.stations))
+      .then((data) =>
+        setNetworks([
+          ...data.map((data: Network) => ({
+            id: data.id,
+            name: data.name,
+            external_id: data.external_id,
+          })),
+        ])
+      )
       .catch((error) => console.error("Error:", error));
-  }, [filters]);
+  }, []);
 
   return networks;
 };

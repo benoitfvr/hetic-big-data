@@ -2,20 +2,23 @@ import "./App.css";
 
 import { useRef, useState } from "react";
 import { Map as LeafletMap } from "leaflet";
-import { useNetworksData } from "@hooks/useNetworksData";
+import { useStationsData } from "@hooks/useStationsData";
 import Map from "@components/ui/Map";
 import { buildQuery } from "./lib/utils";
 import { useCitiesData } from "@hooks/useCitiesData";
 import { Checkbox } from "@components/ui/checkbox";
+import { useNetworksData } from "@hooks/useNetworksData";
 
 function App() {
   const [filters, setFilters] = useState({
     location: "",
     free_bikes: false,
     ebikes: false,
+    network_id: "",
   });
 
-  const stations = useNetworksData(buildQuery(filters));
+  const stations = useStationsData(buildQuery(filters));
+  const networks = useNetworksData();
   const cities = useCitiesData();
 
   // const [mapWidth, setMapWidth] = useState("75vw");
@@ -24,6 +27,11 @@ function App() {
   const handleCityChange = (e: React.FormEvent<HTMLSelectElement>) => {
     const { value } = e.currentTarget;
     setFilters((prevFilters) => ({ ...prevFilters, location: value }));
+  };
+
+  const handleNetworkChange = (e: React.FormEvent<HTMLSelectElement>) => {
+    const { value } = e.currentTarget;
+    setFilters((prevFilters) => ({ ...prevFilters, network_id: value }));
   };
 
   const handleChangeEbikes = (checked: boolean) => {
@@ -104,6 +112,29 @@ function App() {
                   {cities.map((c) => (
                     <option value={c} key={c}>
                       {c}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label
+                  htmlFor="network"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Network
+                </label>
+                <select
+                  id="network"
+                  className="mt-1 block w-40 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  onChange={handleNetworkChange}
+                  value={filters.network_id}
+                >
+                  <option value="">Select a network</option>{" "}
+                  {/* Default option */}
+                  {networks.map((n) => (
+                    <option value={n.external_id} key={n.id}>
+                      {n.name}
                     </option>
                   ))}
                 </select>
