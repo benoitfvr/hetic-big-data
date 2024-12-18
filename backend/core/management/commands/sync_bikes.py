@@ -1,6 +1,8 @@
 from django.core.management.base import BaseCommand
 import requests
 from core.models import Network, Station
+from asgiref.sync import async_to_sync
+from channels.layers import get_channel_layer
 
 class Command(BaseCommand):
     help = "Synchronise les données des réseaux et stations de vélos situés en France."
@@ -10,7 +12,6 @@ class Command(BaseCommand):
             # Étape 1 : Récupérer tous les réseaux
             networks_url = "https://api.citybik.es/v2/networks"
             response = requests.get(networks_url)
-            print(response)
             networks_data = response.json()
 
             if "networks" not in networks_data:
@@ -74,7 +75,32 @@ class Command(BaseCommand):
                 except Exception as network_error:
                     self.stdout.write(self.style.ERROR(f"Erreur pour le réseau {network_id} : {network_error}"))
 
-            self.stdout.write(self.style.SUCCESS("Synchronisation des réseaux français terminée."))
+            # Étape 3 : Diffuser les mises à jour via WebSocket
+            stations = Station.objects.all()
+            station_data = [
+                {
+                    "name": station.name,
+                    "free_bikes": station.free_bikes,
+                    "empty_slots": station.empty_slots,
+                    "ebikes": station.ebikes,
+                    "latitude": station.latitude,
+                    "longitude": station.longitude,
+                    "address": station.address,
+                    "network": station.network.name,
+                }
+                for station in stations
+            ]
+
+            channel_layer = get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                "stations",
+                {
+                    "type": "send_station_update",
+                    "message": {"stations": station_data},
+                }
+            )
+
+            self.stdout.write(self.style.SUCCESS("Synchronisation des réseaux français terminée et mise à jour envoyée."))
 
         except Exception as e:
             self.stdout.write(self.style.ERROR(f"Erreur globale : {str(e)}"))
