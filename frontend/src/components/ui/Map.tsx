@@ -5,7 +5,7 @@ import {
   Popup,
   TileLayer,
 } from "react-leaflet";
-import { Network } from "src/types/Network";
+import { Station } from "src/types/Network";
 import { Map as LeafletMap } from "leaflet";
 
 import "leaflet/dist/leaflet.css";
@@ -13,11 +13,11 @@ import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility
 import "leaflet-defaulticon-compatibility";
 
 type MapProps = {
-  networks: Network[];
+  stations: Station[];
   mapRef: React.LegacyRef<LeafletMap>;
 };
 
-const Map = ({ networks, mapRef }: MapProps) => {
+const Map = ({ stations, mapRef }: MapProps) => {
   const MAPBOX_ACCESS_TOKEN = import.meta.env.VITE_MAPBOX_KEY;
   const MAPBOX_STYLE_ID = "mapbox/streets-v11"; // Change this to your preferred map style
 
@@ -37,24 +37,27 @@ const Map = ({ networks, mapRef }: MapProps) => {
         url={`https://api.mapbox.com/styles/v1/${MAPBOX_STYLE_ID}/tiles/{z}/{x}/{y}?access_token=${MAPBOX_ACCESS_TOKEN}`}
       />
       <LayerGroup>
-        {networks.map((network) =>
-          network.stations.map((station) => (
-            <Circle
-              key={station.id}
-              center={[station.latitude, station.longitude]}
-              pathOptions={{ color: "blue", fillColor: "blue" }}
-              radius={200}
-            >
-              <Popup>
-                <strong>{station.name}</strong>
-                <br />
-                Free Bikes: {station.free_bikes}
-                <br />
-                Empty Slots: {station.empty_slots}
-              </Popup>
-            </Circle>
-          ))
-        )}
+        {stations.map((station) => (
+          <Circle
+            key={
+              station.name +
+              station.network +
+              station.latitude.toString +
+              station.longitude.toString()
+            }
+            center={[station.latitude, station.longitude]}
+            pathOptions={{ color: "blue", fillColor: "blue" }}
+            radius={200}
+          >
+            <Popup>
+              <strong>{station.name}</strong>
+              <br />
+              Free Bikes: {station.free_bikes}
+              <br />
+              Empty Slots: {station.empty_slots}
+            </Popup>
+          </Circle>
+        ))}
       </LayerGroup>
     </MapContainer>
   );

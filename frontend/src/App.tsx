@@ -1,15 +1,38 @@
 import "./App.css";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { Map as LeafletMap } from "leaflet";
 import { useNetworksData } from "@hooks/useNetworksData";
 import Map from "@components/ui/Map";
+import { buildQuery } from "./lib/utils";
+import { useCitiesData } from "@hooks/useCitiesData";
+import { Checkbox } from "@components/ui/checkbox";
 
 function App() {
-  const networks = useNetworksData();
+  const [filters, setFilters] = useState({
+    location: "",
+    free_bikes: false,
+    ebikes: false,
+  });
+
+  const stations = useNetworksData(buildQuery(filters));
+  const cities = useCitiesData();
 
   // const [mapWidth, setMapWidth] = useState("75vw");
   const mapRef = useRef<LeafletMap | null>(null);
+
+  const handleCityChange = (e: React.FormEvent<HTMLSelectElement>) => {
+    const { value } = e.currentTarget;
+    setFilters((prevFilters) => ({ ...prevFilters, location: value }));
+  };
+
+  const handleChangeEbikes = (checked: boolean) => {
+    setFilters((prevFilters) => ({ ...prevFilters, ebikes: checked }));
+  };
+
+  const handleChangeFreeBikes = (checked: boolean) => {
+    setFilters((prevFilters) => ({ ...prevFilters, free_bikes: checked }));
+  };
 
   // useEffect(() => {
   //   const handleScroll = () => {
@@ -33,66 +56,63 @@ function App() {
 
         <div className="p-4 border-2 border-gray-200 mb-2">
           <div className="flex items-center justify-between w-full mb-2 p-4 bg-white border">
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-6">
               <div>
                 <label
-                  htmlFor="type"
+                  htmlFor="ebikes"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Type
+                  E-bikes
                 </label>
-                <select
-                  id="type"
-                  className="mt-1 block w-40 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                >
-                  <option>Tous</option>
-                  <option>Vélos</option>
-                  <option>Stations</option>
-                </select>
+                <Checkbox
+                  id="ebikes"
+                  name="ebikes"
+                  checked={filters.ebikes}
+                  onCheckedChange={handleChangeEbikes}
+                />
               </div>
 
               <div>
                 <label
-                  htmlFor="region"
+                  htmlFor="free_bikes"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Région
+                  Free Bikes
                 </label>
-                <select
-                  id="region"
-                  className="mt-1 block w-40 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
-                >
-                  <option>Toutes</option>
-                  <option>Île-de-France</option>
-                  <option>Auvergne-Rhône-Alpes</option>
-                </select>
+                <Checkbox
+                  id="free_bikes"
+                  name="free_bikes"
+                  checked={filters.free_bikes}
+                  onCheckedChange={handleChangeFreeBikes}
+                />
               </div>
 
               <div>
                 <label
-                  htmlFor="status"
+                  htmlFor="cities"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Statut
+                  City
                 </label>
                 <select
-                  id="status"
+                  id="cities"
                   className="mt-1 block w-40 rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500"
+                  onChange={handleCityChange}
+                  value={filters.location}
                 >
-                  <option>Tous</option>
-                  <option>Disponible</option>
-                  <option>Indisponible</option>
+                  <option value="">Select a city</option> {/* Default option */}
+                  {cities.map((c) => (
+                    <option value={c} key={c}>
+                      {c}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
-
-            <button className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-              Filtrer
-            </button>
           </div>
 
           <div className="w-fit overflow-hidden" style={{ width: "97%" }}>
-            <Map mapRef={mapRef} networks={networks} />
+            <Map mapRef={mapRef} stations={stations} />
           </div>
         </div>
       </div>
