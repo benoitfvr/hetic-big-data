@@ -1,8 +1,12 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Network, Station, TrafficEvent
-from .serializers import NetworkSerializer, TrafficEventSerializer
+from .models import Network, Station, TrafficEvent, Penalty
+from .serializers import (
+    NetworkSerializer,
+    TrafficEventSerializer,
+    PenaltySerializer,
+)
 from django.db.models import Q
 from django.shortcuts import render
 
@@ -80,6 +84,17 @@ class TrafficEventsListView(APIView):
         events = TrafficEvent.objects.all()
         serializer = TrafficEventSerializer(events, many=True)
         return Response({"events": serializer.data}, status=status.HTTP_200_OK)
+
+
+class PenaltyListView(APIView):
+    """
+    View pour lister les pénalités.
+    """
+
+    def get(self, request):
+        penalties = Penalty.objects.all()
+        serializer = PenaltySerializer(penalties, many=True)
+        return Response({"penalties": serializer.data}, status=status.HTTP_200_OK)
 
 
 def watch_view(request):
