@@ -1,15 +1,17 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .models import Network, Station
-from .serializers import NetworkSerializer
+from .models import Network, Station, TrafficEvent
+from .serializers import NetworkSerializer, TrafficEventSerializer
 from django.db.models import Q
 from django.shortcuts import render
+
 
 class NetworkListView(APIView):
     """
     View pour lister les réseaux disponibles.
     """
+
     def get(self, request):
         networks = Network.objects.all()
         serializer = NetworkSerializer(networks, many=True)
@@ -22,20 +24,20 @@ class StationView(APIView):
     """
 
     def get(self, request):
-        network_id = request.GET.get("network_id", None) 
-        free_bikes = request.GET.get("free_bikes", None) 
-        location = request.GET.get("location", None)      
-        ebikes = request.GET.get("ebikes", None)       
+        network_id = request.GET.get("network_id", None)
+        free_bikes = request.GET.get("free_bikes", None)
+        location = request.GET.get("location", None)
+        ebikes = request.GET.get("ebikes", None)
 
         filters = Q()
         if network_id:
-            filters &= Q(network__external_id=network_id) 
+            filters &= Q(network__external_id=network_id)
         if free_bikes:
-            filters &= Q(free_bikes__gt=0) 
+            filters &= Q(free_bikes__gt=0)
         if location:
-            filters &= Q(network__city__icontains=location) 
+            filters &= Q(network__city__icontains=location)
         if ebikes:
-            filters &= Q(ebikes__gt=0) 
+            filters &= Q(ebikes__gt=0)
 
         stations = Station.objects.filter(filters)
 
@@ -54,8 +56,8 @@ class StationView(APIView):
         ]
 
         return Response({"stations": station_data}, status=status.HTTP_200_OK)
-    
-    
+
+
 class CityListView(APIView):
     """
     View pour lister toutes les villes où des stations sont présentes.
@@ -67,7 +69,18 @@ class CityListView(APIView):
         cities = [city for city in cities if city]
 
         return Response({"cities": cities}, status=status.HTTP_200_OK)
-    
+
+
+class TrafficEventsListView(APIView):
+    """
+    View pour lister les événements de trafic.
+    """
+
+    def get(self, request):
+        events = TrafficEvent.objects.all()
+        serializer = TrafficEventSerializer(events, many=True)
+        return Response({"events": serializer.data}, status=status.HTTP_200_OK)
+
 
 def watch_view(request):
-    return render(request, 'watch.html')
+    return render(request, "watch.html")

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Network, Station
+from .models import Network, Station, TrafficEvent
 
 
 class StationSerializer(serializers.ModelSerializer):
@@ -32,3 +32,9 @@ class NetworkSerializer(serializers.ModelSerializer):
             "latitude",
             "longitude",
         ]
+
+
+class TrafficEventSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TrafficEvent
+        fields = "__all__"  # Include all fields, or specify which ones you need
