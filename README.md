@@ -8,6 +8,7 @@ Application permettant de visualiser et d'analyser les donn√©es de transport (v√
 - Paul Mazeau ([@PaulMazeau](https://github.com/PaulMazeau))<br />
 - Nicolas Marsan ([@NicoooM](https://github.com/NicoooM))<br />
 - Antonin Charpentier ([@toutouff](https://github.com/toutouff))<br />
+- Louis Fortrie ([@louisFortrie](https://github.com/louisFortrie))<br />
 
 ## How to launch the project
 
