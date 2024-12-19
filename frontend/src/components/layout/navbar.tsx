@@ -1,5 +1,6 @@
 import { cn } from "../../lib/utils";
 import { useEffect, useState } from "react";
+import { Link } from 'react-router-dom';
 
 interface NavbarProps {
   className?: string;
@@ -13,8 +14,8 @@ export function Navbar({ className }: NavbarProps) {
     const handleScroll = () => {
       const scrollPosition = window.scrollY;
       const viewportHeight = window.innerHeight;
-      const targetScroll = viewportHeight * 0.4; 
-            
+      const targetScroll = viewportHeight * 0.4;
+      
       const newOpacity = Math.max(0, 1 - (scrollPosition / targetScroll));
       setOpacity(newOpacity);
       setDisplay(newOpacity === 0 ? 'none' : 'block');
@@ -32,30 +33,30 @@ export function Navbar({ className }: NavbarProps) {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <div className="flex items-center">
-            <a href="/" className="text-xl font-bold">
+            <Link to="/" className="text-xl font-bold">
               France Bike Data
-            </a>
+            </Link>
           </div>
           
           <div className="hidden md:flex items-center space-x-8">
-            <a 
-              href="/map" 
+            <Link 
+              to="/" 
               className="text-gray-600 hover:text-gray-900 transition-colors"
             >
               Carte
-            </a>
-            <a 
-              href="/stats" 
+            </Link>
+            <Link 
+              to="/stats" 
               className="text-gray-600 hover:text-gray-900 transition-colors"
             >
               Statistiques
-            </a>
-            <a 
-              href="/about" 
+            </Link>
+            <Link 
+              to="/about" 
               className="text-gray-600 hover:text-gray-900 transition-colors"
             >
               À propos
-            </a>
+            </Link>
           </div>
         </div>
       </div>
