@@ -12,19 +12,9 @@ import React from "react";
 import "leaflet/dist/leaflet.css";
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.webpack.css";
 import "leaflet-defaulticon-compatibility";
-const API_URL = import.meta.env.VITE_API_URL;
+import { Penalty } from "../../types/Penalty";
 
-interface Verbalisation {
-  id: number;
-  penalty_type: string;
-  penalty_category: string;
-  borough: string;
-  neighborhood_council: string;
-  period: string;
-  penalty_number: number;
-  year: string;
-  quarter: number;
-}
+const API_URL = import.meta.env.VITE_API_URL;
 
 interface Arrondissement {
   n_sq_ar: number;
@@ -46,9 +36,7 @@ const Map = ({ stations, mapRef }: MapProps) => {
   const MAPBOX_ACCESS_TOKEN = import.meta.env.VITE_MAPBOX_KEY;
   const MAPBOX_STYLE_ID = "mapbox/streets-v11";
 
-  const [verbalisations, setVerbalisations] = React.useState<Verbalisation[]>(
-    []
-  );
+  const [verbalisations, setVerbalisations] = React.useState<Penalty[]>([]);
   const [arrondissements, setArrondissements] = React.useState<
     Arrondissement[]
   >([]);
