@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Network, Station, TrafficEvent
+from .models import Network, Station, TrafficEvent, Penalty
 
 
 class StationSerializer(serializers.ModelSerializer):
@@ -37,4 +37,10 @@ class NetworkSerializer(serializers.ModelSerializer):
 class TrafficEventSerializer(serializers.ModelSerializer):
     class Meta:
         model = TrafficEvent
+        fields = "__all__"  # Include all fields, or specify which ones you need
+
+
+class PenaltySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Penalty
         fields = "__all__"  # Include all fields, or specify which ones you need

@@ -43,3 +43,20 @@ class TrafficEvent(models.Model):
     lat2 = models.FloatField()
     lon2 = models.FloatField()
     direction = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"{self.street} - {self.type}"
+
+
+class Penalty(models.Model):
+    penalty_type = models.CharField(max_length=255)
+    penalty_category = models.CharField(max_length=255)
+    borough = models.CharField(max_length=255)
+    neighborhood_council = models.CharField(max_length=255)
+    period = models.CharField(max_length=255)
+    penalty_number = models.IntegerField()
+    year = models.CharField(max_length=255)
+    quarter = models.IntegerField()
+
+    def __str__(self):
+        return f"{self.penalty_type} - {self.penalty_number} ({self.year})"
