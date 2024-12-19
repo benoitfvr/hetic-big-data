@@ -1,10 +1,10 @@
 import {
-  Circle,
   LayerGroup,
   MapContainer,
   Popup,
   TileLayer,
-  Polyline,
+  GeoJSON,
+  Circle
 } from "react-leaflet";
 import { Station } from "src/types/Network";
 import { Map as LeafletMap } from "leaflet";
@@ -13,15 +13,27 @@ import "leaflet/dist/leaflet.css";
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.webpack.css";
 import "leaflet-defaulticon-compatibility";
 
-interface CirculationEvent {
-  id: string;
-  description: string;
-  type: string;
-  street: string;
-  polyline: string;
-  direction: string;
-  starttime: string;
-  endtime: string;
+interface Verbalisation {
+  type_infraction: string;
+  categorie_infraction: string;
+  arrondissement: string;
+  conseil_de_quartier: string;
+  periode: string;
+  nb_verbalisation: number;
+  annee: string;
+  trimestre: number;
+  trimestre_annee: string;
+}
+
+interface Arrondissement {
+  n_sq_ar: number;
+  c_ar: number;
+  l_ar: string;
+  l_aroff: string;
+  geom: {
+    type: string;
+    geometry: GeoJSON.Geometry;
+  };
 }
 
 type MapProps = {
@@ -31,33 +43,96 @@ type MapProps = {
 
 const Map = ({ stations, mapRef }: MapProps) => {
   const MAPBOX_ACCESS_TOKEN = import.meta.env.VITE_MAPBOX_KEY;
-  const MAPBOX_STYLE_ID = "mapbox/streets-v11"; // Change this to your preferred map style
+  const MAPBOX_STYLE_ID = "mapbox/streets-v11";
 
-  const [circulationEvents, setCirculationEvents] = React.useState<CirculationEvent[]>([]);
-  const [activeLayerIds, setActiveLayerIds] = React.useState(['stations', 'circulation']);
+  const [verbalisations, setVerbalisations] = React.useState<Verbalisation[]>([]);
+  const [arrondissements, setArrondissements] = React.useState<Arrondissement[]>([]);
+  const [activeLayerIds, setActiveLayerIds] = React.useState(['stations', 'verbalisations']);
 
+  // Charger les verbalisations
   React.useEffect(() => {
-    fetch('/circulation_evenement.json')
+    fetch('/dpmp-verbalisations.json')
       .then(response => response.json())
       .then(data => {
-        console.log("Circulation events loaded:", data);
-        setCirculationEvents(data);
+        console.log("Verbalisations loaded:", data);
+        setVerbalisations(data);
       })
-      .catch(error => console.error("Error loading circulation events:", error));
+      .catch(error => console.error("Error loading verbalisations:", error));
   }, []);
 
-  console.log("Current stations:", stations);
-  console.log("Current circulation events:", circulationEvents);
-  console.log("Active layers:", activeLayerIds);
+  // Charger les arrondissements
+  React.useEffect(() => {
+    fetch('/arrondissements.json')
+      .then(response => response.json())
+      .then(data => {
+        console.log("Arrondissements loaded:", data);
+        setArrondissements(data);
+      })
+      .catch(error => console.error("Error loading arrondissements:", error));
+  }, []);
 
-  const parsePolyline = (polylineStr: string): [number, number][] => {
-    return polylineStr.split(' ')
-      .reduce((acc: [number, number][], curr: string, i: number, arr: string[]) => {
-        if (i % 2 === 0) {
-          acc.push([parseFloat(curr), parseFloat(arr[i + 1])]);
-        }
-        return acc;
-      }, []);
+  // Calculer le nombre total d'infractions par arrondissement
+  const getInfractionsParArrondissement = (numArrondissement: number) => {
+    const arrStr = numArrondissement < 10 ? `7500${numArrondissement}` : `750${numArrondissement}`;
+    return verbalisations
+      .filter(v => v.arrondissement === arrStr)
+      .reduce((sum, v) => sum + v.nb_verbalisation, 0);
+  };
+
+  // Style pour les polygones des arrondissements
+  const getArrondissementStyle = (feature: any) => {
+    const nbInfractions = getInfractionsParArrondissement(feature.properties.c_ar);
+    
+    // Définir la couleur en fonction du nombre d'infractions
+    let fillColor;
+    if (nbInfractions === 0) {
+      fillColor = '#FFEDA080';        // Jaune très clair pour aucune infraction
+    } else if (nbInfractions < 1000) {
+      fillColor = '#FED97680';        // Jaune clair
+    } else if (nbInfractions < 2000) {
+      fillColor = '#FEB24C90';        // Orange clair
+    } else if (nbInfractions < 3000) {
+      fillColor = '#FD8D3C90';        // Orange
+    } else if (nbInfractions < 4000) {
+      fillColor = '#FC4E2A90';        // Orange foncé
+    } else if (nbInfractions < 5000) {
+      fillColor = '#E31A1C90';        // Rouge
+    } else if (nbInfractions < 6000) {
+      fillColor = '#BD002D90';        // Rouge foncé
+    } else if (nbInfractions < 7000) {
+      fillColor = '#9A002490';        // Rouge très foncé
+    } else if (nbInfractions < 8000) {
+      fillColor = '#77001B90';        // Bordeaux
+    } else if (nbInfractions < 9000) {
+      fillColor = '#54001390';        // Bordeaux foncé
+    } else if (nbInfractions < 10000) {
+      fillColor = '#31000A90';        // Bordeaux très foncé
+    } else {
+      fillColor = '#0E000290';        // Presque noir
+    }
+
+    return {
+      fillColor: fillColor,
+      weight: 2,
+      opacity: 1,
+      color: '#666',
+      fillOpacity: 0.9,
+      dashArray: '3'
+    };
+  };
+
+  // Convertir les arrondissements en format GeoJSON
+  const arrondissementsGeoJSON: GeoJSON.FeatureCollection = {
+    type: "FeatureCollection" as const,
+    features: arrondissements.map(arr => ({
+      type: "Feature" as const,
+      properties: {
+        c_ar: arr.c_ar,
+        l_ar: arr.l_ar,
+        l_aroff: arr.l_aroff
+      },
+      geometry: arr.geom.geometry
+    }))
   };
 
   return (
@@ -90,11 +165,11 @@ const Map = ({ stations, mapRef }: MapProps) => {
         </button>
         <button
           onClick={() => setActiveLayerIds(prev => 
-            prev.includes('circulation') ? prev.filter(id => id !== 'circulation') : [...prev, 'circulation']
+            prev.includes('verbalisations') ? prev.filter(id => id !== 'verbalisations') : [...prev, 'verbalisations']
           )}
           style={{
-            backgroundColor: activeLayerIds.includes('circulation') ? '#3887be' : '#fff',
-            color: activeLayerIds.includes('circulation') ? '#fff' : '#404040',
+            backgroundColor: activeLayerIds.includes('verbalisations') ? '#3887be' : '#fff',
+            color: activeLayerIds.includes('verbalisations') ? '#fff' : '#404040',
             margin: '0 5px',
             padding: '5px 10px',
             border: '1px solid #ddd',
@@ -102,7 +177,7 @@ const Map = ({ stations, mapRef }: MapProps) => {
             cursor: 'pointer'
           }}
         >
-          Circulation
+          Infractions
         </button>
       </div>
 
@@ -113,7 +188,7 @@ const Map = ({ stations, mapRef }: MapProps) => {
           width: "97vw",
         }}
         center={[48.8566, 2.3522]}
-        zoom={13}
+        zoom={12}
         scrollWheelZoom={true}
       >
         <TileLayer
@@ -121,8 +196,24 @@ const Map = ({ stations, mapRef }: MapProps) => {
           url={`https://api.mapbox.com/styles/v1/${MAPBOX_STYLE_ID}/tiles/{z}/{x}/{y}?access_token=${MAPBOX_ACCESS_TOKEN}`}
         />
         
-        {/* Groupe des stations de vélo */}
-        {activeLayerIds.includes('stations') && stations.length > 0 && (
+        {activeLayerIds.includes('verbalisations') && arrondissements.length > 0 && (
+          <LayerGroup>
+            <GeoJSON
+              data={arrondissementsGeoJSON}
+              style={getArrondissementStyle}
+              onEachFeature={(feature, layer) => {
+                const nbInfractions = getInfractionsParArrondissement(feature.properties.c_ar);
+                layer.bindPopup(`
+                  <strong>${feature.properties.l_ar}</strong><br/>
+                  ${feature.properties.l_aroff}<br/>
+                  Nombre d'infractions: ${nbInfractions}
+                `);
+              }}
+            />
+          </LayerGroup>
+        )}
+
+{activeLayerIds.includes('stations') && stations.length > 0 && (
           <LayerGroup>
             {stations.map((station) => (
               <Circle
@@ -150,34 +241,6 @@ const Map = ({ stations, mapRef }: MapProps) => {
                   Empty Slots: {station.empty_slots}
                 </Popup>
               </Circle>
-            ))}
-          </LayerGroup>
-        )}
-
-        {/* Groupe des événements de circulation */}
-        {activeLayerIds.includes('circulation') && circulationEvents.length > 0 && (
-          <LayerGroup>
-            {circulationEvents.map((event) => (
-              <Polyline
-                key={event.id}
-                positions={parsePolyline(event.polyline)}
-                pathOptions={{
-                  color: event.type === 'ROAD_CLOSED' ? 'red' : 'orange',
-                  weight: 3,
-                }}
-              >
-                <Popup>
-                  <strong>{event.street}</strong>
-                  <br />
-                  {event.description}
-                  <br />
-                  Type: {event.type}
-                  <br />
-                  Du: {new Date(event.starttime).toLocaleDateString()}
-                  <br />
-                  Au: {new Date(event.endtime).toLocaleDateString()}
-                </Popup>
-              </Polyline>
             ))}
           </LayerGroup>
         )}
