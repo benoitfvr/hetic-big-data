@@ -1,11 +1,11 @@
 export type Penalty = {
-  type_infraction: string;
-  categorie_infraction: string;
-  arrondissement: string;
-  conseil_de_quartier: string;
-  periode: string;
-  nb_verbalisation: number;
-  annee: string;
-  trimestre: number;
-  trimestre_annee: string;
+  id: number;
+  penalty_type: string;
+  penalty_category: string;
+  borough: string;
+  neighborhood_council: string;
+  period: string;
+  penalty_number: number;
+  year: string;
+  quarter: number;
 };
