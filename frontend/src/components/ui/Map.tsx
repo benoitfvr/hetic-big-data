@@ -31,19 +31,16 @@ interface Arrondissement {
 type MapProps = {
   stations: Station[];
   mapRef: React.LegacyRef<LeafletMap>;
+  activeLayerIds: string[];
 };
 
-const Map = ({ stations, mapRef }: MapProps) => {
+const Map = ({ stations, mapRef, activeLayerIds }: MapProps) => {
   const MAPBOX_ACCESS_TOKEN = import.meta.env.VITE_MAPBOX_KEY;
   const MAPBOX_STYLE_ID = "mapbox/streets-v11";
 
   const [arrondissements, setArrondissements] = React.useState<
     Arrondissement[]
   >([]);
-  const [activeLayerIds, setActiveLayerIds] = React.useState([
-    "stations",
-    "verbalisations",
-  ]);
 
   // Charger les verbalisations
   const verbalisations = usePenaltyData();
@@ -130,66 +127,6 @@ const Map = ({ stations, mapRef }: MapProps) => {
 
   return (
     <>
-      <div
-        style={{
-          position: "absolute",
-          top: "10px",
-          right: "10px",
-          zIndex: 1000,
-          backgroundColor: "white",
-          padding: "10px",
-          borderRadius: "4px",
-          boxShadow: "0 0 10px rgba(0,0,0,0.1)",
-        }}
-      >
-        <button
-          onClick={() =>
-            setActiveLayerIds((prev) =>
-              prev.includes("stations")
-                ? prev.filter((id) => id !== "stations")
-                : [...prev, "stations"]
-            )
-          }
-          style={{
-            backgroundColor: activeLayerIds.includes("stations")
-              ? "#3887be"
-              : "#fff",
-            color: activeLayerIds.includes("stations") ? "#fff" : "#404040",
-            margin: "0 5px",
-            padding: "5px 10px",
-            border: "1px solid #ddd",
-            borderRadius: "3px",
-            cursor: "pointer",
-          }}
-        >
-          Stations
-        </button>
-        <button
-          onClick={() =>
-            setActiveLayerIds((prev) =>
-              prev.includes("verbalisations")
-                ? prev.filter((id) => id !== "verbalisations")
-                : [...prev, "verbalisations"]
-            )
-          }
-          style={{
-            backgroundColor: activeLayerIds.includes("verbalisations")
-              ? "#3887be"
-              : "#fff",
-            color: activeLayerIds.includes("verbalisations")
-              ? "#fff"
-              : "#404040",
-            margin: "0 5px",
-            padding: "5px 10px",
-            border: "1px solid #ddd",
-            borderRadius: "3px",
-            cursor: "pointer",
-          }}
-        >
-          Infractions
-        </button>
-      </div>
-
       <MapContainer
         ref={mapRef}
         style={{
