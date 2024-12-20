@@ -13,6 +13,7 @@ import "leaflet/dist/leaflet.css";
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.webpack.css";
 import "leaflet-defaulticon-compatibility";
 import { Penalty } from "../../types/Penalty";
+import { usePenaltyData } from "@hooks/usePenaltyData";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -36,7 +37,6 @@ const Map = ({ stations, mapRef }: MapProps) => {
   const MAPBOX_ACCESS_TOKEN = import.meta.env.VITE_MAPBOX_KEY;
   const MAPBOX_STYLE_ID = "mapbox/streets-v11";
 
-  const [verbalisations, setVerbalisations] = React.useState<Penalty[]>([]);
   const [arrondissements, setArrondissements] = React.useState<
     Arrondissement[]
   >([]);
@@ -46,15 +46,7 @@ const Map = ({ stations, mapRef }: MapProps) => {
   ]);
 
   // Charger les verbalisations
-  React.useEffect(() => {
-    fetch(API_URL + "/penalties")
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("Verbalisations loaded:", data);
-        setVerbalisations(data.penalties);
-      })
-      .catch((error) => console.error("Error loading verbalisations:", error));
-  }, []);
+  const verbalisations = usePenaltyData();
 
   // Charger les arrondissements
   React.useEffect(() => {
