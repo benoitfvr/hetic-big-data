@@ -42,6 +42,11 @@ function App() {
     setFilters((prevFilters) => ({ ...prevFilters, free_bikes: checked }));
   };
 
+  const [activeLayerIds, setActiveLayerIds] = useState([
+    "stations",
+    "verbalisations",
+  ]);
+
   // useEffect(() => {
   //   const handleScroll = () => {
   //     const scrollPosition = window.scrollY;
@@ -140,10 +145,64 @@ function App() {
                 </select>
               </div>
             </div>
+            <div>
+              <button
+                onClick={() =>
+                  setActiveLayerIds((prev) =>
+                    prev.includes("stations")
+                      ? prev.filter((id) => id !== "stations")
+                      : [...prev, "stations"]
+                  )
+                }
+                style={{
+                  backgroundColor: activeLayerIds.includes("stations")
+                    ? "#3887be"
+                    : "#fff",
+                  color: activeLayerIds.includes("stations")
+                    ? "#fff"
+                    : "#404040",
+                  margin: "0 5px",
+                  padding: "5px 10px",
+                  border: "1px solid #ddd",
+                  borderRadius: "3px",
+                  cursor: "pointer",
+                }}
+              >
+                Stations
+              </button>
+              <button
+                onClick={() =>
+                  setActiveLayerIds((prev) =>
+                    prev.includes("verbalisations")
+                      ? prev.filter((id) => id !== "verbalisations")
+                      : [...prev, "verbalisations"]
+                  )
+                }
+                style={{
+                  backgroundColor: activeLayerIds.includes("verbalisations")
+                    ? "#3887be"
+                    : "#fff",
+                  color: activeLayerIds.includes("verbalisations")
+                    ? "#fff"
+                    : "#404040",
+                  margin: "0 5px",
+                  padding: "5px 10px",
+                  border: "1px solid #ddd",
+                  borderRadius: "3px",
+                  cursor: "pointer",
+                }}
+              >
+                Infractions
+              </button>
+            </div>
           </div>
 
           <div className="w-fit overflow-hidden" style={{ width: "97%" }}>
-            <Map mapRef={mapRef} stations={stations} />
+            <Map
+              mapRef={mapRef}
+              stations={stations}
+              activeLayerIds={activeLayerIds}
+            />
           </div>
         </div>
       </div>
