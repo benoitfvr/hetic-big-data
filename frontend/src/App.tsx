@@ -11,7 +11,7 @@ import { useNetworksData } from "@hooks/useNetworksData";
 
 function App() {
   const [filters, setFilters] = useState({
-    location: "",
+    location: "Paris",
     free_bikes: false,
     ebikes: false,
     network_id: "",
