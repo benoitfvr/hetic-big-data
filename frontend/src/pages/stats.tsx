@@ -4,28 +4,20 @@ import { useStationsData } from "@hooks/useStationsData";
 import { useNetworksData } from "@hooks/useNetworksData";
 import { useMemo, useState, useEffect } from "react";
 import { PieChart, Pie, Cell } from "recharts";
-import { Penalty } from "src/types/Penalty";
+import { usePenaltyData } from "@hooks/usePenaltyData";
 const API_URL = import.meta.env.VITE_API_URL;
 
 export default function Stats() {
   // Récupération des données
   const stations = useStationsData("");
+  const verbalisations = usePenaltyData();
   const networks = useNetworksData();
 
   // Nouvelles données
-  const [verbalisations, setVerbalisations] = useState<Penalty[]>([]);
   const [arrondissements, setArrondissements] = useState<any[]>([]);
 
   // Charger les données
   useEffect(() => {
-    fetch(API_URL + "/penalties")
-      .then((response) => response.json())
-      .then((data) => {
-        console.log("Verbalisations loaded:", data);
-        setVerbalisations(data.penalties);
-      })
-      .catch((error) => console.error("Error loading verbalisations:", error));
-
     fetch("/arrondissements.json")
       .then((response) => response.json())
       .then((data) => setArrondissements(data))
